@@ -5,9 +5,14 @@ const kTempTextStyle = TextStyle(
   fontSize: 100.0,
 );
 
+const kTimeTextStyle = TextStyle(
+  fontFamily: 'Spartan MB',
+  fontSize: 80.0,
+);
+
 const kMessageTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
-  fontSize: 60.0,
+  fontSize: 50.0,
 );
 
 const kButtonTextStyle = TextStyle(
@@ -16,5 +21,31 @@ const kButtonTextStyle = TextStyle(
 );
 
 const kConditionTextStyle = TextStyle(
-  fontSize: 100.0,
+  fontSize: 50.0,
 );
+
+const kCardTitleTextStyle = TextStyle(
+  fontSize: 20.0,
+  fontFamily: 'Spartan MB',
+);
+
+const kCardSubtitleTextStyle = TextStyle(
+  fontSize: 15.0,
+  fontFamily: 'Spartan MB',
+);
+
+const kTextFieldInputDecoration = InputDecoration(
+  filled: true,
+  fillColor: Colors.white,
+  icon: Icon(Icons.location_city, color: Colors.white,),
+  hintText: "Enter City Name",
+  hintStyle: TextStyle(color: Colors.grey),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+    borderSide: BorderSide.none,
+  ),
+);
+
+
+const kOneSec = const Duration(seconds:10);
+

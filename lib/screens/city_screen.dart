@@ -8,6 +8,9 @@ class CityScreen extends StatefulWidget {
 
 class _CityScreenState extends State<CityScreen> {
   @override
+
+  String searchQuery;
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -24,7 +27,9 @@ class _CityScreenState extends State<CityScreen> {
               Align(
                 alignment: Alignment.topLeft,
                 child: FlatButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: Icon(
                     Icons.arrow_back_ios,
                     size: 50.0,
@@ -33,10 +38,22 @@ class _CityScreenState extends State<CityScreen> {
               ),
               Container(
                 padding: EdgeInsets.all(20.0),
-                child: null,
+                child: TextField(
+                  style: TextStyle(color: Colors.black),
+                  decoration: kTextFieldInputDecoration,
+                  onChanged: (value){
+                    print(value);
+                    searchQuery = value;
+                  },
+                  onSubmitted: (theStr){
+                    Navigator.pop(context,theStr);
+                  },
+                ),
               ),
               FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context,searchQuery);
+                },
                 child: Text(
                   'Get Weather',
                   style: kButtonTextStyle,
