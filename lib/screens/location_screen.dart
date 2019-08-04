@@ -5,6 +5,7 @@ import 'package:clima/services/weather.dart';
 import 'package:flutter/cupertino.dart';
 import 'city_screen.dart';
 import 'dart:async';
+import 'dart:ui';
 
 // The base class for the different types of items the list can contain.
 abstract class ListItem {}
@@ -206,114 +207,122 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
         ),
         constraints: BoxConstraints.expand(),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Row(
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 5.0,
+              sigmaY: 5.0,
+            ),
+            child: SafeArea(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  FlatButton(
-                    onPressed: () async {
-                      var weatherData = await weather.getLocationWeather();
-                      var weatherForecast = await weather.getLocationForecast();
-                      if (weatherData == null){
-                        _showDialog();
-                      }else{
-                        generateItems(weatherForecast);
-                        updateUI(weatherData);
-                        getBackground(weatherData);
-                      }
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      FlatButton(
+                        onPressed: () async {
+                          var weatherData = await weather.getLocationWeather();
+                          var weatherForecast = await weather.getLocationForecast();
+                          if (weatherData == null){
+                            _showDialog();
+                          }else{
+                            generateItems(weatherForecast);
+                            updateUI(weatherData);
+                            getBackground(weatherData);
+                          }
 
-                    },
-                    child: Icon(
-                      Icons.near_me,
-                      size: 50.0,
+                        },
+                        child: Icon(
+                          Icons.near_me,
+                          size: 50.0,
+                        ),
+                      ),
+                      FlatButton(
+                        onPressed: () async {
+                          var typedName = await Navigator.push(context, MaterialPageRoute(builder: (context){
+                            return CityScreen();
+                          }));
+                          if (typedName != null){
+                            var weatherData = await weather.getCityWeather(typedName);
+                            var fivedayWeather = await weather.getCityForecast(typedName);
+                            generateItems(fivedayWeather);
+                            updateUI(weatherData);
+                            getBackground(weatherData);
+                          }
+                        },
+                        child: Icon(
+                          Icons.location_city,
+                          size: 50.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          '$temperature°C',
+                          style: kTempTextStyle,
+                        ),
+                        Text(
+                          '$weatherIcon',
+                          style: kConditionTextStyle,
+                        ),
+                      ],
                     ),
                   ),
-                  FlatButton(
-                    onPressed: () async {
-                      var typedName = await Navigator.push(context, MaterialPageRoute(builder: (context){
-                        return CityScreen();
-                      }));
-                      if (typedName != null){
-                        var weatherData = await weather.getCityWeather(typedName);
-                        var fivedayWeather = await weather.getCityForecast(typedName);
-                        generateItems(fivedayWeather);
-                        updateUI(weatherData);
-                        getBackground(weatherData);
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          '$localTime',
+                          style: kTimeTextStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                Container(
+                  height: 100.0,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: fiveDayList.length,
+                    itemBuilder: (context, index) {
+                      final item = fiveDayList[index];
+                      if (item is HeadingItem) {
+                        return Container(
+                          width: 200,
+                          child: Card(
+                            color: Colors.transparent,
+                            child: ListTile(
+                              leading: Text(item.weatherPicCode,style: TextStyle(fontSize: 30),),
+                              title: Text(
+                                "${item.theTemp.toString()}°C",
+                                style: kCardTitleTextStyle
+                              ),
+                              subtitle: Text(item.theTime.substring(5,16),style: kCardSubtitleTextStyle,),
+
+                            ),
+                          ),
+                        );
                       }
                     },
-                    child: Icon(
-                      Icons.location_city,
-                      size: 50.0,
+                  ),
+                ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 15.0),
+                    child: Text(
+                      "$weatherMessage $cityName!",
+                      textAlign: TextAlign.right,
+                      style: kMessageTextStyle,
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.only(left: 15.0),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      '$temperature°C',
-                      style: kTempTextStyle,
-                    ),
-                    Text(
-                      '$weatherIcon',
-                      style: kConditionTextStyle,
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 15.0),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      '$localTime',
-                      style: kTimeTextStyle,
-                    ),
-                  ],
-                ),
-              ),
-            Container(
-              height: 100.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: fiveDayList.length,
-                itemBuilder: (context, index) {
-                  final item = fiveDayList[index];
-                  if (item is HeadingItem) {
-                    return Container(
-                      width: 200,
-                      child: Card(
-                        color: Colors.transparent,
-                        child: ListTile(
-                          leading: Text(item.weatherPicCode,style: TextStyle(fontSize: 30),),
-                          title: Text(
-                            "${item.theTemp.toString()}°C",
-                            style: kCardTitleTextStyle
-                          ),
-                          subtitle: Text(item.theTime.substring(5,16),style: kCardSubtitleTextStyle,),
-
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
             ),
-              Padding(
-                padding: EdgeInsets.only(right: 15.0),
-                child: Text(
-                  "$weatherMessage $cityName!",
-                  textAlign: TextAlign.right,
-                  style: kMessageTextStyle,
-                ),
-              ),
-            ],
           ),
         ),
       ),
